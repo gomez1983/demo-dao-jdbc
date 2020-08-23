@@ -52,15 +52,8 @@ public class SellerDaoJDBC implements SellerDao {
 			st.setInt(1, id);
 			rs = st.executeQuery(); // Esse comando acima é executado e o resultado cai em result set "rs"
 			if (rs.next()) { // Testa se veio algum resultado. Caso não retorne registro, o rs conect dá falto e pula o "if". O vendedor, no caso, é nulo (não tem vendedor com o id).
-				Department dep = new Department(); // Instancia um departamento
-				dep.setId(rs.getInt("DepartmentId")); // Seta o id do Departamento conforme o nome dele na tabela.
-				dep.setName(rs.getString("DepName")); // Seta o nome do vendedor conforme o nome dele na tabela.
-				Seller obj = new Seller();
-				obj.setId(rs.getInt("Id"));
-				obj.setName(rs.getString("Name"));
-				obj.setBaseSalary(rs.getDouble("BaseSalary"));
-				obj.setBirthDate(rs.getDate("BirthDate"));
-				obj.setDepartment(dep); // Aqui é um objeto inteiro, não apenas o ID da tabela
+				Department dep = instantiateDepartment(rs);
+				Seller obj = instantiateSeller(rs, dep);
 				return obj;
 			}
 			return null;
@@ -73,6 +66,23 @@ public class SellerDaoJDBC implements SellerDao {
 			DB.closeResultSet(rs);
 		}
 		
+	}
+
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
+		Seller obj = new Seller();
+		obj.setId(rs.getInt("Id"));
+		obj.setName(rs.getString("Name"));
+		obj.setBaseSalary(rs.getDouble("BaseSalary"));
+		obj.setBirthDate(rs.getDate("BirthDate"));
+		obj.setDepartment(dep); // Aqui é um objeto inteiro, não apenas o ID da tabela
+		return obj;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		Department dep = new Department(); // Instancia um departamento
+		dep.setId(rs.getInt("DepartmentId")); // Seta o id do Departamento conforme o nome dele na tabela.
+		dep.setName(rs.getString("DepName")); // Seta o nome do vendedor conforme o nome dele na tabela.
+		return dep;
 	}
 
 	@Override
