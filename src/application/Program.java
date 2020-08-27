@@ -23,7 +23,13 @@ public class Program {
 		Department department = new Department(2, null);
 		List<Seller> list = sellerDao.findByDepartment(department);
 		for (Seller obj : list ) { // Pra cada seller da minha lista ...
-			System.out.println(obj); // ... pe impresso no terminal esse objeto
+			System.out.println(obj); // ... É impresso no terminal esse objeto
 		}
+		
+		System.out.println("\n=== TEST 3: seller findByDepartment ===");
+		list = sellerDao.findAll();
+		for (Seller obj : list ) { // Pra cada seller da minha lista ...
+			System.out.println(obj); // ... É impresso no terminal esse objeto
+		}	
 	}
 }
