@@ -1,5 +1,6 @@
 package application;
 
+import java.util.Date;
 import java.util.List;
 
 import model.dao.DaoFactory;
@@ -26,10 +27,16 @@ public class Program {
 			System.out.println(obj); // ... É impresso no terminal esse objeto
 		}
 		
-		System.out.println("\n=== TEST 3: seller findByDepartment ===");
+		System.out.println("\n=== TEST 3: seller findAll ==="); //Corrigido no nome desde o último commit
 		list = sellerDao.findAll();
 		for (Seller obj : list ) { // Pra cada seller da minha lista ...
 			System.out.println(obj); // ... É impresso no terminal esse objeto
-		}	
-	}
+		
+		}
+		
+		System.out.println("\n=== TEST 4: seller insert ===");
+		Seller newSeller = new Seller(null, "Greg", "greg@gmail.com", new Date(), 4000.0, department);
+		sellerDao.insert(newSeller); //Insere no banco de dados
+		System.out.println("Inserted! New id = " + newSeller.getId());
+		}
 }

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +25,42 @@ public class SellerDaoJDBC implements SellerDao {
 	}
 
 	@Override
-	public void insert(Seller obj) {
-		// TODO Auto-generated method stub
-		
+	public void insert(Seller obj) { // obj é o parâmetro de entrada. Os dados adicionados abaixo vão pertencer a este obj
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement(
+					"INSERT INTO seller "
+					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) " // Todos os itens da tabela do banco de dados. 
+					+ "VALUES "
+					+ "(?, ?, ?, ?, ?)", // Correspondem as colunas da tabela; São chamados de PLACEHOLDERS porque seriam os textos que ficam numa tabela como marcação (como um box de login que está escrito "login", mas ele some quando você começa a digitar).
+					Statement.RETURN_GENERATED_KEYS); // Retorna o ID do vendedor inserido.
+			
+			st.setString(1, obj.getName()); // Insere nome do "obj". No caso, String.
+			st.setString(2, obj.getEmail()); // Insere email do "obj". No caso, String.
+			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime())); // Insere a data de nascimento do "obj". No caso, deste construtor, tem que colocar o "getTime".
+			st.setDouble(4, obj.getBaseSalary()); // Insere salário do "obj". No caso, Double.
+			st.setInt(5, obj.getDepartment().getId()); // Insere departamento do "obj". No caso, o ID é um int. Primeiro acessa o Departamento usando "getDepartment()", depois de acessar, insere o ID por meio do "getId()".
+			
+			int rowsAffected = st.executeUpdate(); // Executa o update do que foi inserido acima.
+			
+			if (rowsAffected > 0) { // Se a coluna afetada for maior que 0, significa que foi inserido valores.
+				ResultSet rs = st.getGeneratedKeys(); // Então os dados são inseridos
+				if (rs.next()) { 
+					int id = rs.getInt(1); // Se o ID for gerado...
+							obj.setId(id); // ... ele é atribuido ao objeto "obj".
+				}
+				DB.closeResultSet(rs); // Exceção personalizada caso nenhuma linha ter sido alterada.
+			}
+			else {
+				throw new DbException("Unexpected error! No rows affected!");
+			}
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
