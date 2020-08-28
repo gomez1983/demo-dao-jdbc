@@ -4,11 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.mysql.jdbc.Statement;
 
 import db.DB;
 import db.DbException;
@@ -65,12 +66,34 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public void update(Seller obj) {
-		// TODO Auto-generated method stub
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement(
+					"UPDATE seller "
+					+ "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "
+					+ "WHERE Id = ?"); // Aqui em update, esse seria o 6 interrogação 
+								
+			st.setString(1, obj.getName()); // Atualiza nome do "obj". No caso, String.
+			st.setString(2, obj.getEmail()); // Atualiza email do "obj". No caso, String.
+			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime())); // Atualiza a data de nascimento do "obj". No caso, deste construtor, tem que colocar o "getTime".
+			st.setDouble(4, obj.getBaseSalary()); // Atualiza salário do "obj". No caso, Double.
+			st.setInt(5, obj.getDepartment().getId()); // Atualiza departamento do "obj". No caso, o ID é um int. Primeiro acessa o Departamento usando "getDepartment()", depois de acessar, insere o ID por meio do "getId()".
+			st.setInt(6, obj.getId());
+			
+			st.executeUpdate(); // Executa o update do que foi inserido acima.
+			
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 		
 	}
 
 	@Override
-	public void deleteById(Seller obj) {
+	public void deleteById(Integer id) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -109,6 +132,7 @@ public class SellerDaoJDBC implements SellerDao {
 		Seller obj = new Seller();
 		obj.setId(rs.getInt("Id"));
 		obj.setName(rs.getString("Name"));
+		obj.setEmail(rs.getString("Email"));
 		obj.setBaseSalary(rs.getDouble("BaseSalary"));
 		obj.setBirthDate(rs.getDate("BirthDate"));
 		obj.setDepartment(dep); // Aqui é um objeto inteiro, não apenas o ID da tabela
